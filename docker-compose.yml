@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  backend:
+    image: my-django
+    build:
+      context: ./django_app
+      dockerfile: Dockerfile
+    expose:
+      - 8000
+    depends_on:
+      - database
+    command: gunicorn stocks_products.wsgi:application --bind 0.0.0.0:8000
+  database:
+    image: postgres:11
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: root
+      POSTGRES_DB: netology
+    volumes:
+      - pg-data:/var/lib/postgres/data
+  server:
+    image: nginx:latest
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    ports:
+      - 80:80
+    depends_on:
+      - backend
+volumes:
+    pg-data:
